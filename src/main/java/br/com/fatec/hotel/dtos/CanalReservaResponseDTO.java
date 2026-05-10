@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CanaisReservaResponseDTO {
+public class CanalReservaResponseDTO {
     private Long id;
     private String nome;
     private Double taxaComissao; 

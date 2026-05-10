@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CanaisReservaRequestDTO {
+public class CanalReservaRequestDTO {
 
     @NotBlank(message = "O nome é obrigatório")
     @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres")

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "canais_reserva")
-public class CanaisReserva {
+public class CanalReserva {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
