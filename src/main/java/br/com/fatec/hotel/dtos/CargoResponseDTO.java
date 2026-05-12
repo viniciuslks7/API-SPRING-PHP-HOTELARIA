@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CargoResponseDTO {
     
-    private Long id;
+    private Long codCargo;
     private String nomeCargo;
     private Double salarioBase;
 

@@ -14,8 +14,8 @@ public class Hotel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_hotel")
-    private Long id;
+    @Column(name = "codhotel")
+    private Long codHotel;
 
     @Column(nullable = false, length = 150)
     private String nome;
@@ -23,12 +23,6 @@ public class Hotel {
     @Column(nullable = false, length = 18, unique = true)
     private String cnpj;
 
-    @Column(name = "classificacao_estrelas")
-    private Integer classificacaoEstrelas;
-
-    @Column(length = 255)
-    private String endereco;
-
-    @Column(length = 20)
-    private String telefone;
+    @Column(nullable = false)
+    private Integer estrelas;
 }

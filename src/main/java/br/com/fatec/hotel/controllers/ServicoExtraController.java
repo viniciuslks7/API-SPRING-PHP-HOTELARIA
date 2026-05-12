@@ -43,7 +43,7 @@ public class ServicoExtraController {
     public ResponseEntity<ServicoExtraResponseDTO> insert(@Valid @RequestBody ServicoExtraRequestDTO requestDTO) {
         ServicoExtraResponseDTO responseDTO = service.insert(requestDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(responseDTO.getId()).toUri();
+                .buildAndExpand(responseDTO.getCodServicos()).toUri();
         return ResponseEntity.created(uri).body(responseDTO);
     }
 

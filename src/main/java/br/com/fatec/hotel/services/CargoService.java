@@ -58,7 +58,7 @@ public class CargoService {
 
     private CargoResponseDTO toDTO(Cargo entity) {
         return new CargoResponseDTO(
-                entity.getId(),
+                entity.getCodCargo(),
                 entity.getNomeCargo(),
                 entity.getSalarioBase());
     }

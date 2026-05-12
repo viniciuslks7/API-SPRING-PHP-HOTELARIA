@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TipoQuartoResponseDTO {
-    private Long id;
+    private Long codTipo;
     private String nome;
     private Double precoBase;
-    private Integer capacidadePessoas;
 }

@@ -14,8 +14,8 @@ public class Nacionalidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_nacionalidade")
-    private Long id;
+    @Column(name = "codnacionalidade")
+    private Long codNacionalidade;
 
     @Column(nullable = false, length = 100)
     private String nomePais;

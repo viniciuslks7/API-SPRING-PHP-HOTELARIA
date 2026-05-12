@@ -14,13 +14,9 @@ public class CanalReserva {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_canal")
-    private long id;
+    @Column(name = "codcanais")
+    private Long codCanais;
 
     @Column(nullable = false, length = 150)
     private String nome;
-
-    @Column(name = "taxa_comissao", nullable = false)
-    private Double taxaComissao;
-
 }

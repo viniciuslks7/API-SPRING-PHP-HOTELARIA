@@ -58,14 +58,12 @@ public class CanalReservaService {
 
     private CanalReservaResponseDTO toDTO(CanalReserva entity) {
         return new CanalReservaResponseDTO(
-                entity.getId(),
-                entity.getNome(),
-                entity.getTaxaComissao());
+                entity.getCodCanais(),
+                entity.getNome());
     }
 
     private void copyDtoToEntity(CanalReservaRequestDTO dto, CanalReserva entity) {
         entity.setNome(dto.getNome());
-        entity.setTaxaComissao(dto.getTaxaComissao());
     }
 
 }

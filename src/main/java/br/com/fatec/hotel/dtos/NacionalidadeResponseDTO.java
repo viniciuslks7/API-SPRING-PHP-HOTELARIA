@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NacionalidadeResponseDTO {
     
-    private Long id;
+    private Long codNacionalidade;
     private String nomePais;
 
 }

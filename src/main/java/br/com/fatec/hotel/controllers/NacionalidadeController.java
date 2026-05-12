@@ -43,7 +43,7 @@ public class NacionalidadeController {
     public ResponseEntity<NacionalidadeResponseDTO> insert(@Valid @RequestBody NacionalidadeRequestDTO requestDTO) {
         NacionalidadeResponseDTO responseDTO = service.insert(requestDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(responseDTO.getId()).toUri();
+                .buildAndExpand(responseDTO.getCodNacionalidade()).toUri();
         return ResponseEntity.created(uri).body(responseDTO);
     }
 

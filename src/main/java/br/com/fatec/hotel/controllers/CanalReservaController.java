@@ -43,7 +43,7 @@ public class CanalReservaController {
     public ResponseEntity<CanalReservaResponseDTO> insert(@Valid @RequestBody CanalReservaRequestDTO requestDTO) {
         CanalReservaResponseDTO responseDTO = service.insert(requestDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(responseDTO.getId()).toUri();
+                .buildAndExpand(responseDTO.getCodCanais()).toUri();
         return ResponseEntity.created(uri).body(responseDTO);
     }
 

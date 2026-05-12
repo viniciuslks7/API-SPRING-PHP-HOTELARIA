@@ -35,7 +35,7 @@ public class HotelController {
     public ResponseEntity<HotelResponseDTO> insert(@Valid @RequestBody HotelRequestDTO requestDTO) {
         HotelResponseDTO responseDTO = service.insert(requestDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(responseDTO.getId()).toUri();
+                .buildAndExpand(responseDTO.getCodHotel()).toUri();
         return ResponseEntity.created(uri).body(responseDTO);
     }
 

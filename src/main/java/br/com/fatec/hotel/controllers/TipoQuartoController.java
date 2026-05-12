@@ -43,7 +43,7 @@ public class TipoQuartoController {
     public ResponseEntity<TipoQuartoResponseDTO> insert(@Valid @RequestBody TipoQuartoRequestDTO requestDTO) {
         TipoQuartoResponseDTO responseDTO = service.insert(requestDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(responseDTO.getId()).toUri();
+                .buildAndExpand(responseDTO.getCodTipo()).toUri();
         return ResponseEntity.created(uri).body(responseDTO);
     }
 

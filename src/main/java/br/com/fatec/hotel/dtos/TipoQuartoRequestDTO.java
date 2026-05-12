@@ -1,6 +1,5 @@
 package br.com.fatec.hotel.dtos;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,9 +20,4 @@ public class TipoQuartoRequestDTO {
     @NotNull(message = "O preço é obrigatório")
     @Positive(message = "O preço deve ser positivo!")
     private Double precoBase;
-
-    @Min(value = 1, message = "A capacidade deve ser de no mínimo 1 pessoa")
-    @Positive(message = "A capacidade de pessoas deve ser positiva!")
-    private Integer capacidadePessoas;
-
 }

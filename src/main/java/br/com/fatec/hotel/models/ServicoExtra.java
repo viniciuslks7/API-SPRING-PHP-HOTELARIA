@@ -14,8 +14,8 @@ public class ServicoExtra {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_servico")
-    private Long id;
+    @Column(name = "codservicos")
+    private Long codServicos;
 
     @Column(nullable = false, length = 150)
     private String nome;

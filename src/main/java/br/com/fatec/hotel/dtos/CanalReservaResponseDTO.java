@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CanalReservaResponseDTO {
-    private Long id;
+    private Long codCanais;
     private String nome;
-    private Double taxaComissao; 
 }

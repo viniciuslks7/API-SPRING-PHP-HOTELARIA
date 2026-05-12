@@ -57,20 +57,16 @@ public class HotelService {
 
     private HotelResponseDTO toDTO(Hotel entity) {
         return new HotelResponseDTO(
-                entity.getId(),
+                entity.getCodHotel(),
                 entity.getNome(),
                 entity.getCnpj(),
-                entity.getClassificacaoEstrelas(),
-                entity.getEndereco(),
-                entity.getTelefone()
+                entity.getEstrelas()
         );
     }
 
     private void copyDtoToEntity(HotelRequestDTO dto, Hotel entity) {
         entity.setNome(dto.getNome());
         entity.setCnpj(dto.getCnpj());
-        entity.setClassificacaoEstrelas(dto.getClassificacaoEstrelas());
-        entity.setEndereco(dto.getEndereco());
-        entity.setTelefone(dto.getTelefone());
+        entity.setEstrelas(dto.getEstrelas());
     }
 }

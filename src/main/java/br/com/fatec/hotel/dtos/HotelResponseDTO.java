@@ -8,10 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HotelResponseDTO {
-    private Long id;
+    private Long codHotel;
     private String nome;
     private String cnpj;
-    private Integer classificacaoEstrelas;
-    private String endereco;
-    private String telefone;
+    private Integer estrelas;
 }

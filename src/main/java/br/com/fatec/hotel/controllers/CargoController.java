@@ -43,7 +43,7 @@ public class CargoController {
     public ResponseEntity<CargoResponseDTO> insert(@Valid @RequestBody CargoRequestDTO requestDTO) {
         CargoResponseDTO responseDTO = service.insert(requestDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(responseDTO.getId()).toUri();
+                .buildAndExpand(responseDTO.getCodCargo()).toUri();
         return ResponseEntity.created(uri).body(responseDTO);
     }
 

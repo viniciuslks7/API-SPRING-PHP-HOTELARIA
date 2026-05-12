@@ -58,7 +58,7 @@ public class ServicoExtraService {
 
     private ServicoExtraResponseDTO toDTO(ServicoExtra entity) {
         return new ServicoExtraResponseDTO(
-                entity.getId(),
+                entity.getCodServicos(),
                 entity.getNome(),
                 entity.getPreco());
     }

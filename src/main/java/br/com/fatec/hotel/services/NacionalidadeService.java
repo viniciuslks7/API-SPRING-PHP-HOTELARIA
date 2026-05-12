@@ -58,7 +58,7 @@ public class NacionalidadeService {
 
     private NacionalidadeResponseDTO toDTO(Nacionalidade entity) {
         return new NacionalidadeResponseDTO(
-                entity.getId(),
+                entity.getCodNacionalidade(),
                 entity.getNomePais());
     }
 

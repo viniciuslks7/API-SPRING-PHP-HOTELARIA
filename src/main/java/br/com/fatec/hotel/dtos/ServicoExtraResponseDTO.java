@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ServicoExtraResponseDTO {
     
-    private Long id;
+    private Long codServicos;
     private String nome;
     private Double preco;
 

@@ -58,16 +58,14 @@ public class TipoQuartoService {
 
     private TipoQuartoResponseDTO toDTO(TipoQuarto entity) {
         return new TipoQuartoResponseDTO(
-                entity.getId(),
+                entity.getCodTipo(),
                 entity.getNome(),
-                entity.getPrecoBase(),
-                entity.getCapacidadePessoas());
+                entity.getPrecoBase());
     }
 
     private void copyDtoToEntity(TipoQuartoRequestDTO dto, TipoQuarto entity) {
         entity.setNome(dto.getNome());
         entity.setPrecoBase(dto.getPrecoBase());
-        entity.setCapacidadePessoas(dto.getCapacidadePessoas());
     }
 
 }

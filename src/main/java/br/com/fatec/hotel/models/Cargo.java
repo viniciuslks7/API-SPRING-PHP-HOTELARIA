@@ -5,11 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//   - `@Table(name = "cargos")`
-//   - `Long id` (com `@Id` e `@Column(name = "id_cargo")`)
-//   - `String nomeCargo` (`@Column(nullable = false)`)
-//   - `Double salarioBase`
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,8 +14,8 @@ public class Cargo {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cargo")
-    private Long id;
+    @Column(name = "codcargo")
+    private Long codCargo;
 
     @Column(nullable = false, length = 150)
     private String nomeCargo;
