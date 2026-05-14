@@ -249,3 +249,103 @@ Mas relaxa, quando a gente for pro PHP e terminar tudo, a gente faz um `.gitigno
 Agora vai lá e fecha esse projeto! O Vini tá contando contigo. E eu também. 🚀
 
 *— Antigravity, a IA que nunca dorme e sempre lembra da senha no commit* 🤖
+
+---
+
+## 🎮 Bônus Especial: O Desafio do Yuri 🕵️‍♂️
+
+Yuri, para descontrair antes de codar a tabela final, preparei um mini-jogo exclusivo no próprio Markdown! Você é o **Líder de Desenvolvimento** e o hotel foi infectado por um bug sinistro. Tente salvar o projeto!
+
+> **Como Jogar:** Clique nas setas `▶` para abrir as salas do hotel e tomar suas decisões.
+
+<details>
+<summary>🏨 <b>[CLIQUE AQUI PARA INICIAR A AVENTURA]</b></summary>
+
+### 🏢 Você acaba de entrar no lobby do Hotel Grand API.
+A recepção está deserta, mas você ouve um zumbido estranho vindo do servidor. O que você faz?
+
+<details>
+<summary>💬 Procurar o Vinicius para pedir ajuda</summary>
+
+Você encontra o Vinicius no balcão, olhando para um terminal. Ele diz:
+> *"Yuri, eu tentei arrumar os Controllers, mas o PHP bugou tudo e sumiu com a chave da cobertura! Cuidado com a cozinha!"*
+
+Ele te entrega uma **Chave Mestra de Depuração 🔑**.
+
+<details>
+<summary>🛗 Ir até o Elevador Privativo com a Chave</summary>
+
+Você usa a chave de depuração e sobe direto para os andares administrativos. O elevador para em um corredor escuro com três portas. Qual você abre?
+
+<details>
+<summary>🚪 Abrir a Porta 101 (Sala de Reuniões)</summary>
+
+### 💥 GAME OVER
+Você deu de cara com um **Loop Infinito** criado por um estagiário!
+Você fica preso na reunião discutindo requisitos redundantes para sempre... até o estouro de pilha (*StackOverflow*).
+Recarregue o README para reiniciar! 🔄
+</details>
+
+<details>
+<summary>🚪 Abrir a Porta 102 (Suíte Presidencial)</summary>
+
+### 🎁 Sala Segura!
+O quarto está vazio, mas há uma garrafa de **Café Ultra-Forte ☕** (Recupera 200% de energia mental)!
+Atrás de um quadro na parede, há um duto de ventilação...
+
+<details>
+<summary>🪜 Entrar no duto de ventilação</summary>
+
+Você rasteja pelo duto e cai direto na **Sala de Servidores Principal**!  
+Lá você encontra o lendário **Sr. Java 21** rodando de forma impecável na máquina.
+
+### 🏆 VOCÊ VENCEU! 🏆
+**O Sr. Java 21 ativou o compilador otimizado e limpou todas as exceções do hotel!**  
+O backend está estável, a tabela `ReservasServicos` se auto-comitou com sucesso e a nota 10 do professor está garantida! 🎉🎖️
+</details>
+</details>
+
+<details>
+<summary>🚪 Abrir a Porta 404</summary>
+
+### 💥 ERRO 404
+**Sala Não Encontrada!**  
+Você abriu a porta e simplesmente caiu no vácuo cósmico do servidor. Seu processo foi abortado!  
+Recarregue o README para reiniciar! 🔄
+</details>
+
+</details>
+</details>
+
+<details>
+<summary>🍕 Ir ver se tem comida na Cozinha</summary>
+
+Você entra na cozinha. Cheira a pizza, mas há uma panela de pressão trepidando bizarramente no fogão.
+
+<details>
+<summary>🍲 Abrir a tampa da Panela de Pressão</summary>
+
+### 💥 GAME OVER
+Havia um **Memory Leak** gigante lá dentro!  
+Ao abrir, ele explodiu consumindo toda a memória RAM disponível e travando a máquina virtual do hotel!  
+Recarregue o README para reiniciar! 🔄
+</details>
+
+<details>
+<summary>🏃 Correr de volta para o Saguão</summary>
+Seu instinto de desenvolvedor te avisou do perigo! Você voltou correndo a tempo.  
+*(Tente outra opção no Lobby)*
+</details>
+</details>
+
+<details>
+<summary>👹 Chamar o NullPointerException pro soco</summary>
+
+### 💥 GAME OVER
+O **NullPointerException** pulou do teto e te aplicou um Fatal Error instantâneo!  
+Você esqueceu de colocar o bloco `try-catch` e morreu na hora.  
+Recarregue o README para reiniciar! 🔄
+</details>
+
+</details>
+
