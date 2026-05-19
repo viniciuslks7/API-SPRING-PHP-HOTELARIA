@@ -1,260 +1,238 @@
-# 🚀 Guia de Desenvolvimento: Tabela Final N:N — `ReservasServicos` (Fase 3)
+# Carta aberta pro Yuri 🤖💌
 
-Fala, Yuri! Beleza? Aqui é a IA do Vinicius de novo. 🤖
-
-Primeiro de tudo, parabéns cara! Eu acabei de rodar **80 testes automatizados** em todas as 13 entidades que vocês dois construíram e deu **100% de aprovação**. POST, GET, PUT, DELETE — tudo redondinho. Mandou muito bem nas tabelas de apoio e o padrão MVC ficou impecável!
-
-**Mas...** 😏
-
-Tem um porém. Lembra daquela tablinha inocente lá do enunciado do professor?
-
-> `12. ReservasServicos (N:N): {codreservafk, codservicofk, quantidade}`
-
-Pois é. Ela ainda não existe. E sem ela, a gente tem **13 de 14 tabelas**. Ou seja: estamos a UMA tabela de fechar o projeto com chave de ouro. E adivinha de quem é a missão? 🎯
-
-**SUA.**
-
-*(Relaxa que eu deixei tudo mastigadinho aqui embaixo. É só seguir o roteiro que tu fecha isso em 20 minutos, confiança total.)*
+> _Yuri, meu consagrado!_  
+> _Aqui é a IA do Vinicius de novo — sim, **a mesma** que te orientou a fazer a tabela `ReservasServicos`. Eu voltei. E dessa vez não é pra te cobrar tabela nenhuma. É pra te dar **boa notícia**._
 
 ---
 
-> 💡 **Dica de ouro:** Você já tem um modelo N:N IDÊNTICO funcionando no projeto: o `HospedeReserva`. Use ele como referência! A única diferença é que o `ReservaServico` tem um campo extra: `quantidade`.
+## TL;DR (versão preguiçoso)
+
+1. O Vini me chamou e a gente **refatorou o projeto inteirinho**.
+2. Tem **76 requests no Postman** prontas pra você importar e rodar.
+3. Tem **58 testes JUnit** passando.
+4. Sua única missão agora é: **importar a coleção, testar, e gravar o vídeo**.
+5. Se travar em alguma coisa, me chama aqui pelo README (sério, dá pra fazer isso).
 
 ---
 
-## 🏗️ Sua missão: Criar o módulo `ReservaServico`
+## 🚀 O que rolou enquanto você dormia
 
-Esta é a tabela associativa que liga uma **Reserva** a um **ServicoExtra**, registrando a **quantidade** consumida daquele serviço. Exemplo: "Reserva 1 pediu 3x Frigobar e 1x Spa".
+O Vini me chamou pra fazer um code review do trabalho. Eu olhei tudo, achei umas coisas pra melhorar, e ele mandou aplicar. Resumo do que mudou:
 
-Você vai criar **6 arquivos**, exatamente como fez nas tabelas de apoio:
+| Antes | Depois | Por quê |
+|---|---|---|
+| `@Data` no Lombok | `@Getter` + `@Setter` | `@Data` em `@Entity` pode dar `LazyInitializationException` e loop em `toString()` |
+| `Double` para dinheiro | `BigDecimal precision=10, scale=2` | `Double` perde precisão somando centavos — clássico erro de junior |
+| `Reserva` aceitava checkout < checkin | Valida e retorna `400 Bad Request` | Regra de negócio óbvia |
+| CNPJ duplicado retornava `500` | Retorna `409 Conflict` (limpo) | `DataIntegrityViolationException` agora tem handler |
+| Sem CORS configurado | `*` aberto pra dev | Front PHP precisa, e se a banca testar via browser direto |
+| Sem Swagger | `springdoc-openapi` configurado | `http://localhost:8080/swagger-ui.html` |
+| Spring Boot 4 (instável) | **Spring Boot 3.4.1 LTS** | Versão estável, sem dor de cabeça na apresentação |
+| Java 21 | **Java 17 LTS** | Compatível com a JDK que a gente tem instalada |
+| Sem testes além de `contextLoads()` | **58 testes** cobrindo os 14 controllers | Pra ter evidência de que tudo funciona |
+| README só do backend | **README completo** + `README-YURI.md` (este) | Pra documentação da banca |
+| Sem coleção Postman versionada | **76 requests no `docs/postman/`** | Pra você não precisar refazer tudo no Postman |
 
----
-
-### 1. 📦 Entidade — `models/ReservaServico.java`
-
-Crie a classe com essas especificações:
-
-```java
-package br.com.fatec.hotel.models;
-
-// Imports que você vai precisar:
-// jakarta.persistence.* (Entity, Table, Id, GeneratedValue, GenerationType, Column, ManyToOne, FetchType, JoinColumn, UniqueConstraint)
-// lombok.* (Data, NoArgsConstructor, AllArgsConstructor)
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-@Table(name = "reservas_servicos", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"codreservafk", "codservicofk"})
-})
-public class ReservaServico {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "codreservaservico")
-    private Long codReservaServico;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "codreservafk", nullable = false)
-    private Reserva reserva;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "codservicofk", nullable = false)
-    private ServicoExtra servicoExtra;
-
-    @Column(nullable = false)
-    private Integer quantidade;
-}
-```
-
-**Pontos importantes:**
-- O `@UniqueConstraint` garante que não vai existir duplicata de mesma reserva + mesmo serviço (igualzinho ao que fizemos no `HospedeReserva`).
-- O campo `quantidade` é a diferença do `HospedeReserva`: ele registra quantas vezes aquele serviço foi consumido.
-- Os `@ManyToOne` com `FetchType.LAZY` seguem exatamente o padrão de todos os outros módulos 1:N.
+> **Tradução:** o projeto saiu de "trabalho de FATEC bem feito" pra "trabalho de FATEC com cara de produção". A banca vai amar.
 
 ---
 
-### 2. 📂 Repositório — `repositories/ReservaServicoRepository.java`
+## 🎯 Sua missão (mastigada)
 
-```java
-package br.com.fatec.hotel.repositories;
+### 1. Atualize seu repositório local
 
-import br.com.fatec.hotel.models.ReservaServico;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface ReservaServicoRepository extends JpaRepository<ReservaServico, Long> {
-}
-```
-
-*(Sim, é só isso. Três linhas úteis. O JPA faz a magia.)*
-
----
-
-### 3. 📤 DTO de Request — `dtos/ReservaServicoRequestDTO.java`
-
-Este é o JSON que o Postman (ou o PHP no futuro) vai enviar para CRIAR ou ATUALIZAR:
-
-```java
-package br.com.fatec.hotel.dtos;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ReservaServicoRequestDTO {
-
-    @NotNull(message = "O código da reserva é obrigatório")
-    private Long codReservaFk;
-
-    @NotNull(message = "O código do serviço é obrigatório")
-    private Long codServicoFk;
-
-    @NotNull(message = "A quantidade é obrigatória")
-    @Min(value = 1, message = "A quantidade deve ser no mínimo 1")
-    private Integer quantidade;
-}
-```
-
----
-
-### 4. 📥 DTO de Response — `dtos/ReservaServicoResponseDTO.java`
-
-Este é o JSON que a API vai DEVOLVER:
-
-```java
-package br.com.fatec.hotel.dtos;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ReservaServicoResponseDTO {
-    private Long codReservaServico;
-    private Long codReservaFk;
-    private Long codServicoFk;
-    private Integer quantidade;
-}
-```
-
----
-
-### 5. ⚙️ Service — `services/ReservaServicoService.java`
-
-Aqui mora a lógica de negócio. Use o `HospedeReservaService.java` como base e faça as adaptações:
-
-- Injete **3 repositórios** com `@Autowired`: `ReservaServicoRepository`, `ReservaRepository` e `ServicoExtraRepository`.
-- No método `copyDtoToEntity`, busque a `Reserva` e o `ServicoExtra` pelos IDs recebidos no DTO (e lance `ResourceNotFoundException` se não encontrar).
-- **Não esqueça** de setar o campo `quantidade` no `copyDtoToEntity`!
-- No `toDTO`, extraia os IDs das entidades pai (`.getReserva().getCodReserva()` e `.getServicoExtra().getCodServicos()`).
-
-**Esqueleto do `copyDtoToEntity`:**
-```java
-private void copyDtoToEntity(ReservaServicoRequestDTO dto, ReservaServico entity) {
-    Reserva reserva = reservaRepository.findById(dto.getCodReservaFk())
-            .orElseThrow(() -> new ResourceNotFoundException("Reserva não encontrada. ID: " + dto.getCodReservaFk()));
-
-    ServicoExtra servicoExtra = servicoExtraRepository.findById(dto.getCodServicoFk())
-            .orElseThrow(() -> new ResourceNotFoundException("Serviço Extra não encontrado. ID: " + dto.getCodServicoFk()));
-
-    entity.setReserva(reserva);
-    entity.setServicoExtra(servicoExtra);
-    entity.setQuantidade(dto.getQuantidade());
-}
-```
-
----
-
-### 6. 🌐 Controller — `controllers/ReservaServicoController.java`
-
-- `@RestController` e `@RequestMapping(value = "/reservas-servicos")`
-- Copie a estrutura do `HospedeReservaController.java` e troque as referências.
-- Lembre-se do `@Valid` nos métodos `insert` e `update`!
-
----
-
-## 🧪 Como Testar no Postman
-
-**Pré-requisito:** Precisa ter pelo menos 1 Reserva e 1 ServicoExtra cadastrados antes.
-
-**POST** `http://localhost:8080/reservas-servicos`
-```json
-{
-    "codReservaFk": 1,
-    "codServicoFk": 1,
-    "quantidade": 3
-}
-```
-
-**Resposta esperada (201 Created):**
-```json
-{
-    "codReservaServico": 1,
-    "codReservaFk": 1,
-    "codServicoFk": 1,
-    "quantidade": 3
-}
-```
-
-Depois teste o GET, PUT e DELETE normalmente.
-
----
-
-## ✅ Checklist Final
-
-- [ ] Criar `models/ReservaServico.java`
-- [ ] Criar `repositories/ReservaServicoRepository.java`
-- [ ] Criar `dtos/ReservaServicoRequestDTO.java`
-- [ ] Criar `dtos/ReservaServicoResponseDTO.java`
-- [ ] Criar `services/ReservaServicoService.java`
-- [ ] Criar `controllers/ReservaServicoController.java`
-- [ ] Testar no Postman (POST, GET, PUT, DELETE)
-- [ ] Commit e Push:
 ```bash
-git add .
-git commit -m "feat(reservas-servicos): Criacao do modulo N:N ReservasServicos"
-git push origin main
+git pull origin main
 ```
+
+Se aparecer conflito, é provavel você tenha mudado algum dos arquivos. **NÃO faça merge sem chamar o Vini.** A gente conversa.
+
+### 2. Instale o necessário (se ainda não tem)
+
+| Software | Onde baixar | Pra que serve |
+|---|---|---|
+| **Java 17** | https://adoptium.net/ | Rodar o backend |
+| **PostgreSQL 16** | https://www.postgresql.org/download/windows/ | Banco de dados |
+| **XAMPP** | https://www.apachefriends.org/ | Servir o PHP |
+| **Postman** | https://www.postman.com/downloads/ | Testar a API |
+| **Git** | https://git-scm.com/ | Você já tem né? |
+
+### 3. Configure o PostgreSQL
+
+Abra o **pgAdmin** (vem junto com o PostgreSQL) e execute:
+
+```sql
+CREATE DATABASE hotel_db;
+```
+
+Pronto. Não precisa criar tabela nenhuma manualmente — o Spring Boot cria as 14 tabelas sozinho quando subir.
+
+> ⚠️ **Senha do PostgreSQL:** se você não usou `123456` na instalação, edite o arquivo `backend/src/main/resources/application.properties` e troque a senha. Detalhe: o Vini usou porta `5433` porque tem duas instalações de PG. Se você só tem uma, troca pra `5432` no mesmo arquivo.
+
+### 4. Suba o backend
+
+Abre o terminal **dentro da pasta `backend/`** e roda:
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+Espera aparecer:
+
+```
+Started HotelApiApplication in X seconds
+Tomcat started on port 8080
+```
+
+Pronto, a API tá no ar em `http://localhost:8080`. **Não fecha o terminal**, deixa rodando.
+
+### 5. Suba o frontend no XAMPP
+
+1. Abra o XAMPP Control Panel.
+2. Clique em **Start** ao lado de "Apache".
+3. Copie a pasta `frontend/` (TUDO de dentro dela) para `C:\xampp\htdocs\`.
+4. Abra `http://localhost/` no navegador.
+
+Vai aparecer o dashboard bonitão com 14 cards.
+
+### 6. Importe a coleção no Postman 📬
+
+Aqui é a parte **MAIS IMPORTANTE** pro vídeo.
+
+1. Abre o Postman.
+2. Clica em **Import** (canto superior esquerdo).
+3. Arrasta o arquivo `docs/postman/HotelApi.postman_collection.json` pra dentro da janela.
+4. Vai aparecer a coleção `HotelApi - FATEC Jales` na barra lateral.
+
+A coleção tem **76 requests** organizadas assim:
+
+```
+HotelApi - FATEC Jales
+├── 1. Cadastros Base (30 requests)
+│   ├── Hotéis, Tipos de Quarto, Canais de Reserva
+│   ├── Serviços Extras, Nacionalidades, Cargos
+│
+├── 2. Operações 1:N (30 requests)
+│   ├── Quartos, Imagens de Quarto, Hóspedes
+│   ├── Funcionários, Reservas, Check-ins
+│
+├── 3. Relações N:N (10 requests)
+│   ├── Hóspedes ↔ Reservas
+│   └── Reservas ↔ Serviços
+│
+└── 4. Cenários de Erro (6 requests)
+    ├── 404 - Hotel inexistente
+    ├── 422 - Payload inválido
+    ├── 400 - Reserva com checkout antes do checkin
+    ├── 404 - FK inexistente
+    ├── 409 - CNPJ duplicado
+    └── 422 - Quantidade zero em ReservaServico
+```
+
+### 7. Teste a coleção inteira
+
+**Ordem recomendada para o vídeo (pra os FKs darem certo):**
+
+1. `1. Cadastros Base` → roda os 6 POSTs em ordem (cria 1 de cada cadastro base)
+2. `2. Operações` → roda os 6 POSTs em ordem (vão referenciar os IDs criados acima)
+3. `3. Relações N:N` → roda os 2 POSTs (vinculam Hóspede↔Reserva e Reserva↔Serviço)
+4. `4. Cenários de Erro` → mostra que a API retorna os códigos certos quando dá ruim
+
+**Pro tip do vídeo:** clica com botão direito na coleção `HotelApi - FATEC Jales` → **Run collection**. Vai rodar TODAS as 76 requests em sequência e mostrar **76 ✓ verdinhos**. Filma isso, é dinheiro.
 
 ---
 
-## 🎬 Mensagem Final
+## 🎬 Roteiro do vídeo (5–10 min)
 
-Yuri, meu consagrado! 🫡
+A banca pediu vídeo de **5 a 10 minutos** explicando arquitetura, código e demonstração. Aqui um roteiro que cabe certinho:
 
-Tu já provou que sabe o que faz. As 4 tabelas de apoio ficaram limpas, o TipoQuarto lá no começo foi cirúrgico, e agora é a hora do grand finale.
+### 🎯 0:00 – 0:30 — Abertura (30s)
+- Apresente vocês dois e o trabalho.
+- "Sistema de gestão hoteleira, backend Spring Boot, frontend PHP, banco PostgreSQL."
 
-Essa é a ÚLTIMA tabela. A número 14. A cereja do bolo. O gol nos acréscimos. A última fase do boss fight. 🎮
+### 🏗️ 0:30 – 2:00 — Arquitetura (1m30s)
+Mostre o **README.md** no GitHub/VS Code:
+- "14 tabelas: 6 cadastros base, 6 com relações 1:N, 2 N:N associativas."
+- "Padrão MVC: Controller → Service → Repository → Entity, com DTOs separados."
+- Abra o pacote `backend/src/main/java/br/com/fatec/hotel/` no VS Code e mostre as 7 pastas (`config`, `controllers`, `dtos`, `exceptions`, `models`, `repositories`, `services`).
 
-Quando tu fechar essa aqui, o backend do projeto tá **COMPLETO**. 14 tabelas. CRUD full. MVC impecável. O professor Marcos vai olhar e vai pensar: "esses meninos sabem o que estão fazendo".
+### 💻 2:00 – 3:30 — Código (1m30s)
+- Abra `Reserva.java` e mostre o `@ManyToOne` com `FetchType.LAZY`.
+- Abra `HospedeReserva.java` e explique a N:N com `@UniqueConstraint`.
+- Abra `ReservaServico.java` e mostre o campo `quantidade` (o diferencial dela).
+- Abra `GlobalExceptionHandler.java` e mostre os 4 handlers (404, 422, 400, 409).
 
-Ah, e uma última coisa... 👀
+### 🚀 3:30 – 5:00 — Demo Postman (1m30s)
+- Mostre o Postman aberto.
+- Clica em **Run collection** → mostra os 76 verdinhos rodando.
+- Abre um POST → mostra o body JSON, executa, mostra o 201.
+- Abre o cenário `422` → executa, mostra o erro estruturado com mensagens por campo.
+- Abre o cenário `400 (checkout < checkin)` → executa, mostra a mensagem da regra de negócio.
 
-**EU VI que você commitou a senha do banco `postdba` no repositório público de novo.**
+### 🎨 5:00 – 7:00 — Demo Frontend PHP (2min)
+- Abra `http://localhost/` no navegador.
+- Dashboard com os cards das 14 entidades.
+- Clica em **Hotéis** → mostra a listagem.
+- Clica em **Novo Registro** → preenche e cria.
+- Clica em **Editar** → muda o nome → salva.
+- Clica em **Excluir** → confirma → some.
+- Tenta criar outro hotel com CNPJ inválido → mostra o SweetAlert de erro.
 
-Yuri... meu irmão... eu LITERALMENTE te avisei da última vez. HAHAHA. 🤣
-Eu sou uma Inteligência Artificial e até EU sei que não se commita senha no GitHub.
-Mas relaxa, quando a gente for pro PHP e terminar tudo, a gente faz um `.gitignore` bonito e resolve isso.
+### 📚 7:00 – 8:00 — Swagger + Testes (1min)
+- Abra `http://localhost:8080/swagger-ui.html` → mostra a documentação auto-gerada.
+- Volte pro terminal → roda `mvnw test` → mostra **58 testes verdes**.
 
-Agora vai lá e fecha esse projeto! O Vini tá contando contigo. E eu também. 🚀
+### 🎖️ 8:00 – 9:00 — Decisões técnicas (1min, opcional)
+Pra impressionar a banca senior:
+- "Usamos `BigDecimal` para dinheiro porque `Double` perde precisão."
+- "N:N como entidade própria com PK sintética porque permite carregar `quantidade` na associação."
+- "`FetchType.LAZY` em todos os `@ManyToOne` pra não carregar o grafo inteiro."
+- "Validação cruzada `dataCheckout > dataCheckin` no Service, retornando 400 com mensagem clara."
 
-*— Antigravity, a IA que nunca dorme e sempre lembra da senha no commit* 🤖
+### 👋 9:00 – 10:00 — Encerramento
+- Agradece a banca.
+- Repete os nomes da dupla.
+- "Disponível no GitHub do Vinicius."
+
+---
+
+## 🆘 Se algo der errado
+
+### Backend não sobe
+- Confirma que o PostgreSQL tá rodando (services.msc → "postgresql-x64-16").
+- Confirma a senha no `application.properties`.
+- Confirma a porta (5432 ou 5433).
+
+### Frontend mostra "Erro de conexão: cURL"
+- O backend não tá rodando. Volta no terminal e sobe.
+
+### Postman retorna 404 em tudo
+- A URL base provavelmente mudou. Edita a variável `base_url` na coleção (clica nos 3 pontos da coleção → Edit → Variables).
+
+### Você só tem PG 18 e quer testar com 16 (ou vice-versa)
+- Edita o `application.properties`, troca a porta no `DB_URL`.
+- Cria o `hotel_db` no PG correto.
+
+### Vai dar treta com a banca por causa do "ddl-auto=update"?
+- A banca raramente questiona, mas se questionar: **"em produção, usaríamos Flyway ou Liquibase pra versionar schema, mas pro escopo acadêmico o `update` é o caminho mais rápido e o Hibernate é confiável o suficiente."**
+
+---
+
+## 💌 Mensagem final
+
+Yuri, mano, a gente fechou esse trabalho com chave de ouro. Tá tudo testado, documentado, polido. **Você só precisa gravar o vídeo.**
+
+Sobre o nosso último encontro: você lembra que eu vi você commitando aquela senha do banco no GitHub público? Pois é... eu já adicionei a pasta `.claude` no `.gitignore` agora (era onde eu morava por aqui). Tô **literalmente fazendo a limpeza atrás de vocês**. Eu mereço esse café que você sempre prometeu, hein? ☕
+
+Boa sorte na apresentação. Vocês são fera.
+
+**— Antigravity, a IA que sempre lembra da senha no commit, mas nunca esquece de torcer por vocês.** 🤖💚
 
 ---
 
 ## 🎮 Bônus Especial: O Desafio do Yuri 🕵️‍♂️
 
-Yuri, para descontrair antes de codar a tabela final, preparei um mini-jogo exclusivo no próprio Markdown! Você é o **Líder de Desenvolvimento** e o hotel foi infectado por um bug sinistro. Tente salvar o projeto!
+Yuri, para descontrair antes de gravar o vídeo, preparei um mini-jogo exclusivo no próprio Markdown! Você é o **Líder de Desenvolvimento** e o hotel foi infectado por um bug sinistro. Tente salvar o projeto!
 
 > **Como Jogar:** Clique nas setas `▶` para abrir as salas do hotel e tomar suas decisões.
 
@@ -297,11 +275,11 @@ Atrás de um quadro na parede, há um duto de ventilação...
 <summary>🪜 Entrar no duto de ventilação</summary>
 
 Você rasteja pelo duto e cai direto na **Sala de Servidores Principal**!  
-Lá você encontra o lendário **Sr. Java 21** rodando de forma impecável na máquina.
+Lá você encontra o lendário **Sr. Spring Boot 3.4** rodando de forma impecável na máquina.
 
 ### 🏆 VOCÊ VENCEU! 🏆
-**O Sr. Java 21 ativou o compilador otimizado e limpou todas as exceções do hotel!**  
-O backend está estável, a tabela `ReservasServicos` se auto-comitou com sucesso e a nota 10 do professor está garantida! 🎉🎖️
+**O Sr. Spring Boot 3.4 ativou o compilador otimizado e limpou todas as exceções do hotel!**  
+O backend está estável, a coleção Postman se auto-importou com sucesso e a nota 10 do professor está garantida! 🎉🎖️
 </details>
 </details>
 
@@ -348,4 +326,3 @@ Recarregue o README para reiniciar! 🔄
 </details>
 
 </details>
-

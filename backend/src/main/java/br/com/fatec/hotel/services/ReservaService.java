@@ -71,6 +71,10 @@ public class ReservaService {
     }
 
     private void copyDtoToEntity(ReservaRequestDTO dto, Reserva entity) {
+        if (!dto.getDataCheckout().isAfter(dto.getDataCheckin())) {
+            throw new IllegalArgumentException("A data de check-out deve ser posterior à data de check-in.");
+        }
+
         CanalReserva canalReserva = canalReservaRepository.findById(dto.getCodCanalFk()).orElseThrow(
                 () -> new ResourceNotFoundException("Canal de Reserva não encontrado. ID: " + dto.getCodCanalFk()));
 

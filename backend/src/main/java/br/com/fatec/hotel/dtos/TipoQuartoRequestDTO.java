@@ -1,5 +1,7 @@
 package br.com.fatec.hotel.dtos;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,5 +21,5 @@ public class TipoQuartoRequestDTO {
 
     @NotNull(message = "O preço é obrigatório")
     @Positive(message = "O preço deve ser positivo!")
-    private Double precoBase;
+    private BigDecimal precoBase;
 }

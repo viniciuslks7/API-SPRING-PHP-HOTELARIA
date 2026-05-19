@@ -1,5 +1,6 @@
 package br.com.fatec.hotel.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -30,13 +31,34 @@ public class GlobalExceptionHandler {
         errorParams.put("timestamp", Instant.now());
         errorParams.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
         errorParams.put("error", "Validation exception");
-        
+
         Map<String, String> errors = new HashMap<>();
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
         errorParams.put("errors", errors);
-        
+
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorParams);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException e) {
+        Map<String, Object> errorParams = new HashMap<>();
+        errorParams.put("timestamp", Instant.now());
+        errorParams.put("status", HttpStatus.BAD_REQUEST.value());
+        errorParams.put("error", "Bad request");
+        errorParams.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorParams);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException e) {
+        Map<String, Object> errorParams = new HashMap<>();
+        errorParams.put("timestamp", Instant.now());
+        errorParams.put("status", HttpStatus.CONFLICT.value());
+        errorParams.put("error", "Data integrity violation");
+        errorParams.put("message",
+                "Violação de integridade: registro duplicado ou referência inválida (FK).");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorParams);
     }
 }

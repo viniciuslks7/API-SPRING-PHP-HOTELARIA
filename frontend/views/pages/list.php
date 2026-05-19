@@ -41,7 +41,7 @@ $error  = $result['error'] ?? null;
                 <tr>
                     <th class="th-id">ID</th>
                     <?php foreach ($config['fields'] as $field): ?>
-                    <th><?= $field['label'] ?></th>
+                    <th><?= htmlspecialchars($field['label']) ?></th>
                     <?php endforeach; ?>
                     <th class="th-actions">Ações</th>
                 </tr>

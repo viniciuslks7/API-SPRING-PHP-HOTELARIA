@@ -1,5 +1,7 @@
 package br.com.fatec.hotel.dtos;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,6 +21,6 @@ public class CargoRequestDTO {
 
     @NotNull(message = "O salário base é obrigatório")
     @Positive(message = "O salário base deve ser positivo!")
-    private Double salarioBase;
+    private BigDecimal salarioBase;
 
 }

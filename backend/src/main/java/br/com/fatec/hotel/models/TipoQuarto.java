@@ -1,11 +1,15 @@
 package br.com.fatec.hotel.models;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -20,6 +24,6 @@ public class TipoQuarto {
     @Column(nullable = false, length = 150)
     private String nome;
 
-    @Column(name = "precobase", nullable = false)
-    private Double precoBase;
+    @Column(name = "precobase", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precoBase;
 }

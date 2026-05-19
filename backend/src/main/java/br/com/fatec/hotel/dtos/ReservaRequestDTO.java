@@ -1,5 +1,6 @@
 package br.com.fatec.hotel.dtos;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +22,7 @@ public class ReservaRequestDTO {
 
     @NotNull(message = "O valor total é obrigatório")
     @Positive(message = "O valor total deve ser positivo")
-    private Double valorTotal;
+    private BigDecimal valorTotal;
 
     @NotNull(message = "O código do canal de reserva é obrigatório")
     private Long codCanalFk;

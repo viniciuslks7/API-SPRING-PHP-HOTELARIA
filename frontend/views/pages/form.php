@@ -17,7 +17,7 @@ $formAction = $isEdit
         <a href="?page=<?= $slug ?>" class="btn btn-ghost">
             <i class="fas fa-arrow-left"></i> Voltar
         </a>
-        <h2><?= $isEdit ? 'Editar' : 'Novo' ?> — <?= $config['title'] ?></h2>
+        <h2><?= $isEdit ? 'Editar' : 'Novo' ?> — <?= htmlspecialchars($config['title']) ?></h2>
     </div>
 
     <?php if ($error): ?>
@@ -31,23 +31,23 @@ $formAction = $isEdit
         <div class="form-grid">
             <?php foreach ($config['fields'] as $field): ?>
             <div class="form-group">
-                <label for="<?= $field['name'] ?>">
-                    <?= $field['label'] ?>
+                <label for="<?= htmlspecialchars($field['name']) ?>">
+                    <?= htmlspecialchars($field['label']) ?>
                     <?php if ($field['required'] ?? false): ?>
                     <span class="required">*</span>
                     <?php endif; ?>
                 </label>
                 <input
-                    type="<?= $field['type'] ?>"
-                    id="<?= $field['name'] ?>"
-                    name="<?= $field['name'] ?>"
+                    type="<?= htmlspecialchars($field['type']) ?>"
+                    id="<?= htmlspecialchars($field['name']) ?>"
+                    name="<?= htmlspecialchars($field['name']) ?>"
                     value="<?= htmlspecialchars($values[$field['name']] ?? '') ?>"
                     <?= ($field['required'] ?? false) ? 'required' : '' ?>
-                    <?= isset($field['min']) ? 'min="' . $field['min'] . '"' : '' ?>
-                    <?= isset($field['max']) ? 'max="' . $field['max'] . '"' : '' ?>
-                    <?= isset($field['step']) ? 'step="' . $field['step'] . '"' : '' ?>
+                    <?= isset($field['min']) ? 'min="' . htmlspecialchars($field['min']) . '"' : '' ?>
+                    <?= isset($field['max']) ? 'max="' . htmlspecialchars($field['max']) . '"' : '' ?>
+                    <?= isset($field['step']) ? 'step="' . htmlspecialchars($field['step']) . '"' : '' ?>
                     class="form-input"
-                    placeholder="<?= $field['label'] ?>"
+                    placeholder="<?= htmlspecialchars($field['label']) ?>"
                 >
             </div>
             <?php endforeach; ?>

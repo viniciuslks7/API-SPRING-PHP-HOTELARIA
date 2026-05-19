@@ -114,7 +114,7 @@ $errorMsg   = $_GET['error'] ?? null;
     <script>
         Swal.fire({
             icon: 'success',
-            title: '<?= $successMsg === "created" ? "Criado!" : ($successMsg === "updated" ? "Atualizado!" : "Deletado!") ?>',
+            title: <?= json_encode($successMsg === "created" ? "Criado!" : ($successMsg === "updated" ? "Atualizado!" : "Deletado!")) ?>,
             text: 'Operação realizada com sucesso.',
             timer: 2000,
             showConfirmButton: false,
@@ -129,7 +129,7 @@ $errorMsg   = $_GET['error'] ?? null;
         Swal.fire({
             icon: 'error',
             title: 'Erro',
-            text: '<?= htmlspecialchars($errorMsg) ?>',
+            text: <?= json_encode($errorMsg) ?>,
             background: '#1e1e2e',
             color: '#cdd6f4',
         });

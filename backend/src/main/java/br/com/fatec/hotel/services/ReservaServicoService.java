@@ -24,7 +24,7 @@ public class ReservaServicoService {
     private ReservaServicoRepository repository;
 
     @Autowired
-    private ReservaRepository reservaRepository;;
+    private ReservaRepository reservaRepository;
 
     @Autowired
     private ServicoExtraRepository servicoExtraRepository;

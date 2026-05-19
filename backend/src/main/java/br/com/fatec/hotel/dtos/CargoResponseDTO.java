@@ -1,5 +1,7 @@
 package br.com.fatec.hotel.dtos;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CargoResponseDTO {
-    
+
     private Long codCargo;
     private String nomeCargo;
-    private Double salarioBase;
+    private BigDecimal salarioBase;
 
 }

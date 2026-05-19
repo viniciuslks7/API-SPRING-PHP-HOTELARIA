@@ -1,5 +1,6 @@
 package br.com.fatec.hotel.models;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -12,10 +13,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -33,8 +36,8 @@ public class Reserva {
     @Column(name = "datacheckout", nullable = false)
     private LocalDate dataCheckout;
 
-    @Column(name = "valortotal", nullable = false)
-    private Double valorTotal;
+    @Column(name = "valortotal", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valorTotal;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "codcanalfk", nullable = false)
