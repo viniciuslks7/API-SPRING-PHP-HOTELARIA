@@ -20,3 +20,11 @@ Thumbs.db
 
 # === Claude / IA ===
 .claude/
+
+# === Uploads do frontend (mantém o diretório, ignora conteúdo) ===
+frontend/uploads/*
+!frontend/uploads/.gitkeep
+
+# === Artefatos de skill extract-design-system ===
+.extract-design-system/
+design-system/
