@@ -126,11 +126,139 @@ function initImageUpload(wrapper) {
 // === Loading state no submit do crud-form ===
 function initFormLoading() {
     document.querySelectorAll('form.crud-form').forEach((form) => {
-        form.addEventListener('submit', () => {
+        form.addEventListener('submit', (e) => {
+            // Re-valida tudo antes de enviar; bloqueia se houver erro.
+            const fields = form.querySelectorAll('.form-input, .form-select');
+            let firstInvalid = null;
+            fields.forEach((f) => {
+                if (!validateField(f) && !firstInvalid) firstInvalid = f;
+            });
+            if (firstInvalid) {
+                e.preventDefault();
+                firstInvalid.focus();
+                firstInvalid.closest('.form-group')?.classList.add('has-error');
+                setTimeout(() => firstInvalid.closest('.form-group')?.classList.remove('has-error'), 500);
+                return;
+            }
             const btn = form.querySelector('button[type="submit"].btn-primary');
             if (btn && !btn.disabled) btn.classList.add('is-loading');
         });
     });
+}
+
+// === Validação inline (on blur + on submit) ===
+function validateField(field) {
+    // Pula campos que não são validáveis (file, hidden ainda sem valor obrigatório)
+    if (field.type === 'file' || field.disabled) return true;
+
+    const group = field.closest('.form-group');
+    if (!group) return true;
+
+    const value = (field.value || '').trim();
+    const isRequired = field.hasAttribute('required');
+
+    let error = null;
+
+    if (isRequired && !value) {
+        error = 'Obrigatório.';
+    } else if (value) {
+        // Money: deve casar com regex simples + ser número válido
+        if (field.dataset.money === '1') {
+            const numeric = value.replace(/\./g, '').replace(',', '.');
+            if (isNaN(parseFloat(numeric)) || parseFloat(numeric) < 0) {
+                error = 'Valor monetário inválido.';
+            }
+        } else if (field.tagName === 'INPUT') {
+            // Pattern HTML
+            if (field.pattern) {
+                try {
+                    const re = new RegExp('^(?:' + field.pattern + ')$', 'u');
+                    if (!re.test(value)) error = 'Formato inválido.';
+                } catch (_) { /* regex ruim, ignora */ }
+            }
+            // Number min/max
+            if (!error && field.type === 'number') {
+                const num = parseFloat(value);
+                if (isNaN(num)) error = 'Número inválido.';
+                else if (field.min !== '' && num < parseFloat(field.min)) error = `Mínimo: ${field.min}.`;
+                else if (field.max !== '' && num > parseFloat(field.max)) error = `Máximo: ${field.max}.`;
+            }
+            // Date validation
+            if (!error && (field.type === 'date' || field.type === 'datetime-local') && !field.value) {
+                error = 'Data inválida.';
+            }
+        }
+    }
+
+    renderFieldError(group, field, error);
+    return error === null;
+}
+
+function renderFieldError(group, field, error) {
+    const existing = group.querySelector('.field-error');
+    if (error) {
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+        field.setAttribute('aria-invalid', 'true');
+        if (existing) {
+            existing.querySelector('.error-msg')?.replaceChildren(document.createTextNode(error))
+                || (existing.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> <span class="error-msg">' + error + '</span>');
+        } else {
+            const el = document.createElement('small');
+            el.className = 'field-error';
+            el.setAttribute('role', 'alert');
+            el.id = field.id + '-error';
+            el.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> <span class="error-msg">' + error + '</span>';
+            // Insere após o input/wrapper, antes do hint
+            const hint = group.querySelector('.field-hint');
+            if (hint) group.insertBefore(el, hint);
+            else group.appendChild(el);
+        }
+    } else {
+        field.classList.remove('is-invalid');
+        if (field.value.trim()) field.classList.add('is-valid');
+        else field.classList.remove('is-valid');
+        field.removeAttribute('aria-invalid');
+        if (existing) existing.remove();
+    }
+}
+
+function initInlineValidation() {
+    document.querySelectorAll('form.crud-form .form-input, form.crud-form .form-select').forEach((field) => {
+        field.addEventListener('blur', () => validateField(field));
+        // Limpa erro assim que o usuário começa a digitar de novo
+        field.addEventListener('input', () => {
+            if (field.classList.contains('is-invalid')) {
+                const group = field.closest('.form-group');
+                const err = group?.querySelector('.field-error');
+                if (err) err.remove();
+                field.classList.remove('is-invalid');
+                field.removeAttribute('aria-invalid');
+            }
+            updateCharCounter(field);
+        });
+
+        // Adiciona contador de chars se houver maxlength
+        if (field.maxLength > 0 && field.maxLength < 1000) {
+            const counter = document.createElement('small');
+            counter.className = 'char-counter';
+            counter.setAttribute('aria-live', 'polite');
+            field.closest('.form-group')?.appendChild(counter);
+            updateCharCounter(field);
+        }
+    });
+}
+
+function updateCharCounter(field) {
+    if (!field.maxLength || field.maxLength <= 0 || field.maxLength >= 1000) return;
+    const group = field.closest('.form-group');
+    const counter = group?.querySelector('.char-counter');
+    if (!counter) return;
+    const len = field.value.length;
+    const max = field.maxLength;
+    counter.textContent = `${len} / ${max}`;
+    counter.classList.toggle('is-warning', len > max * 0.8 && len < max);
+    counter.classList.toggle('is-danger', len >= max);
 }
 
 // === Listagem: busca + sort + paginação (client-side) ===
@@ -281,6 +409,7 @@ function initListTable() {
 document.addEventListener('DOMContentLoaded', () => {
     syncThemeToggle();
     initFormLoading();
+    initInlineValidation();
     initListTable();
     document.querySelectorAll('input[data-money="1"]').forEach(applyMoneyMask);
     document.querySelectorAll('[data-image-field]').forEach(initImageUpload);

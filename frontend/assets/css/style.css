@@ -1156,9 +1156,28 @@ body {
     color: var(--text-muted);
 }
 
-.form-input:invalid:not(:placeholder-shown) {
+.form-input.is-invalid,
+.form-select.is-invalid {
     border-color: var(--danger);
-    box-shadow: 0 0 0 3px var(--danger-ring);
+    background: linear-gradient(var(--bg-input), var(--bg-input)) padding-box,
+                var(--danger-soft) border-box;
+}
+
+.form-input.is-invalid:focus,
+.form-select.is-invalid:focus {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 4px var(--danger-ring), var(--glass-inner);
+}
+
+.form-input.is-valid,
+.form-select.is-valid {
+    border-color: var(--success-ring);
+}
+
+.form-input.is-valid:focus,
+.form-select.is-valid:focus {
+    border-color: var(--success);
+    box-shadow: 0 0 0 4px var(--success-ring), var(--glass-inner);
 }
 
 .field-hint {
@@ -1170,6 +1189,52 @@ body {
 
 .field-hint.is-error {
     color: var(--danger);
+}
+
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+    font-size: 0.74rem;
+    color: var(--danger);
+    font-weight: 500;
+    animation: fieldErrorIn 0.25s var(--ease-out-quart);
+}
+
+.field-error i {
+    font-size: 0.78rem;
+}
+
+@keyframes fieldErrorIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.char-counter {
+    margin-top: 0.3rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    letter-spacing: 0.02em;
+}
+
+.char-counter.is-warning { color: var(--warning); }
+.char-counter.is-danger  { color: var(--danger); }
+
+/* Form group shake quando submit falha */
+.form-group.has-error .form-input,
+.form-group.has-error .form-select {
+    animation: shakeX 0.4s var(--ease-out-quart);
+}
+
+@keyframes shakeX {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-4px); }
+    40%      { transform: translateX(4px); }
+    60%      { transform: translateX(-2px); }
+    80%      { transform: translateX(2px); }
 }
 
 /* Money input com prefixo R$ */

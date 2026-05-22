@@ -47,9 +47,9 @@ class CrudController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $this->extractFormData();
-            $validationError = $this->validate($data);
+            $fieldErrors = $this->validate($data);
 
-            if ($validationError === null) {
+            if (empty($fieldErrors)) {
                 $result = $this->api->post($this->entityConfig['endpoint'], $data);
                 if ($result['success']) {
                     header("Location: ?page={$this->entitySlug}&success=created");
@@ -57,28 +57,30 @@ class CrudController
                 }
                 $error = $result['error'] ?? 'Erro ao criar registro.';
             } else {
-                $error = $validationError;
+                $error = 'Corrija os campos destacados abaixo.';
             }
 
             return [
-                'view'    => 'form',
-                'mode'    => 'create',
-                'error'   => $error,
-                'values'  => $data,
-                'config'  => $this->entityConfig,
-                'slug'    => $this->entitySlug,
-                'fkLists' => $this->loadFkLists(),
+                'view'         => 'form',
+                'mode'         => 'create',
+                'error'        => $error,
+                'fieldErrors'  => $fieldErrors,
+                'values'       => $data,
+                'config'       => $this->entityConfig,
+                'slug'         => $this->entitySlug,
+                'fkLists'      => $this->loadFkLists(),
             ];
         }
 
         return [
-            'view'    => 'form',
-            'mode'    => 'create',
-            'error'   => null,
-            'values'  => [],
-            'config'  => $this->entityConfig,
-            'slug'    => $this->entitySlug,
-            'fkLists' => $this->loadFkLists(),
+            'view'         => 'form',
+            'mode'         => 'create',
+            'error'        => null,
+            'fieldErrors'  => [],
+            'values'       => [],
+            'config'       => $this->entityConfig,
+            'slug'         => $this->entitySlug,
+            'fkLists'      => $this->loadFkLists(),
         ];
     }
 
@@ -92,9 +94,9 @@ class CrudController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $this->extractFormData();
-            $validationError = $this->validate($data);
+            $fieldErrors = $this->validate($data);
 
-            if ($validationError === null) {
+            if (empty($fieldErrors)) {
                 $result = $this->api->put($this->entityConfig['endpoint'] . '/' . $id, $data);
                 if ($result['success']) {
                     header("Location: ?page={$this->entitySlug}&success=updated");
@@ -102,18 +104,19 @@ class CrudController
                 }
                 $error = $result['error'] ?? 'Erro ao atualizar registro.';
             } else {
-                $error = $validationError;
+                $error = 'Corrija os campos destacados abaixo.';
             }
 
             return [
-                'view'    => 'form',
-                'mode'    => 'edit',
-                'id'      => $id,
-                'error'   => $error,
-                'values'  => $data,
-                'config'  => $this->entityConfig,
-                'slug'    => $this->entitySlug,
-                'fkLists' => $this->loadFkLists(),
+                'view'         => 'form',
+                'mode'         => 'edit',
+                'id'           => $id,
+                'error'        => $error,
+                'fieldErrors'  => $fieldErrors,
+                'values'       => $data,
+                'config'       => $this->entityConfig,
+                'slug'         => $this->entitySlug,
+                'fkLists'      => $this->loadFkLists(),
             ];
         }
 
@@ -125,14 +128,15 @@ class CrudController
         }
 
         return [
-            'view'    => 'form',
-            'mode'    => 'edit',
-            'id'      => $id,
-            'error'   => null,
-            'values'  => $result['data'],
-            'config'  => $this->entityConfig,
-            'slug'    => $this->entitySlug,
-            'fkLists' => $this->loadFkLists(),
+            'view'         => 'form',
+            'mode'         => 'edit',
+            'id'           => $id,
+            'error'        => null,
+            'fieldErrors'  => [],
+            'values'       => $result['data'],
+            'config'       => $this->entityConfig,
+            'slug'         => $this->entitySlug,
+            'fkLists'      => $this->loadFkLists(),
         ];
     }
 
@@ -187,16 +191,18 @@ class CrudController
 
     /**
      * Validação server-side: regex (pattern) e formato monetário.
-     * Retorna null se tudo OK, ou mensagem de erro.
+     * Retorna mapa ['field_name' => 'mensagem'] — vazio se tudo OK.
      */
-    private function validate(array $data): ?string
+    private function validate(array $data): array
     {
+        $errors = [];
         foreach ($this->entityConfig['fields'] as $field) {
             $name  = $field['name'];
             $value = $data[$name] ?? null;
 
             if (($field['required'] ?? false) && ($value === null || $value === '')) {
-                return "Campo \"{$field['label']}\" é obrigatório.";
+                $errors[$name] = "Obrigatório.";
+                continue;
             }
             if ($value === null || $value === '') {
                 continue;
@@ -204,23 +210,25 @@ class CrudController
 
             if (!empty($field['money'])) {
                 if (!is_numeric($value) || (float)$value < 0) {
-                    return "\"{$field['label']}\" deve ser um valor monetário válido (≥ 0).";
+                    $errors[$name] = "Valor monetário inválido (≥ 0).";
                 }
                 continue;
             }
 
             if (!empty($field['pattern']) && !preg_match('/' . $field['pattern'] . '/u', (string)$value)) {
-                return "\"{$field['label']}\" está em formato inválido.";
+                $errors[$name] = "Formato inválido.";
+                continue;
             }
 
             if (isset($field['min']) && is_numeric($value) && $value < $field['min']) {
-                return "\"{$field['label']}\" deve ser ≥ {$field['min']}.";
+                $errors[$name] = "Valor deve ser ≥ {$field['min']}.";
+                continue;
             }
             if (isset($field['max']) && is_numeric($value) && $value > $field['max']) {
-                return "\"{$field['label']}\" deve ser ≤ {$field['max']}.";
+                $errors[$name] = "Valor deve ser ≤ {$field['max']}.";
             }
         }
-        return null;
+        return $errors;
     }
 
     /**

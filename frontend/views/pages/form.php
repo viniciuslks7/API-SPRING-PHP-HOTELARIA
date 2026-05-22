@@ -1,11 +1,12 @@
 <?php
-$config  = $result['config'];
-$slug    = $result['slug'];
-$mode    = $result['mode'];
-$values  = $result['values'] ?? [];
-$error   = $result['error'] ?? null;
-$id      = $result['id'] ?? null;
-$fkLists = $result['fkLists'] ?? [];
+$config      = $result['config'];
+$slug        = $result['slug'];
+$mode        = $result['mode'];
+$values      = $result['values'] ?? [];
+$error       = $result['error'] ?? null;
+$fieldErrors = $result['fieldErrors'] ?? [];
+$id          = $result['id'] ?? null;
+$fkLists     = $result['fkLists'] ?? [];
 
 $isEdit     = $mode === 'edit';
 $formAction = $isEdit
@@ -44,15 +45,24 @@ if (!function_exists('fmtMoneyInput')) {
     <form method="POST" action="<?= $formAction ?>" class="crud-form"<?= $enctype ?>>
         <div class="form-grid">
             <?php foreach ($config['fields'] as $field):
-                $name     = $field['name'];
-                $label    = $field['label'];
-                $required = $field['required'] ?? false;
-                $val      = $values[$name] ?? '';
-                $hint     = $field['hint'] ?? null;
-                $hintId   = $hint ? $name . '-hint' : null;
-                $describedBy = $hintId ? ' aria-describedby="' . $hintId . '"' : '';
+                $name        = $field['name'];
+                $label       = $field['label'];
+                $required    = $field['required'] ?? false;
+                $val         = $values[$name] ?? '';
+                $hint        = $field['hint'] ?? null;
+                $hintId      = $hint ? $name . '-hint' : null;
+                $fieldError  = $fieldErrors[$name] ?? null;
+                $errorId     = $fieldError ? $name . '-error' : null;
+                $describedByIds = array_filter([$hintId, $errorId]);
+                $describedBy = $describedByIds ? ' aria-describedby="' . implode(' ', $describedByIds) . '"' : '';
+                $invalidAttr = $fieldError ? ' aria-invalid="true"' : '';
+                $invalidClass = $fieldError ? ' is-invalid' : '';
+                $maxLenAttr  = '';
+                if (!empty($field['pattern']) && preg_match('/\{(\d+),(\d+)\}/', $field['pattern'], $m)) {
+                    $maxLenAttr = ' maxlength="' . (int)$m[2] . '" data-minlength="' . (int)$m[1] . '"';
+                }
             ?>
-            <div class="form-group">
+            <div class="form-group<?= $fieldError ? ' has-error' : '' ?>">
                 <label for="<?= htmlspecialchars($name) ?>">
                     <?= htmlspecialchars($label) ?>
                     <?php if ($required): ?><span class="required" aria-hidden="true">*</span><span class="visually-hidden"> (obrigatório)</span><?php endif; ?>
@@ -62,7 +72,7 @@ if (!function_exists('fmtMoneyInput')) {
                     $list = $fkLists[$name];
                 ?>
                     <select id="<?= htmlspecialchars($name) ?>" name="<?= htmlspecialchars($name) ?>"
-                            class="form-select" <?= $required ? 'required' : '' ?><?= $describedBy ?>>
+                            class="form-select<?= $invalidClass ?>" <?= $required ? 'required' : '' ?><?= $describedBy ?><?= $invalidAttr ?>>
                         <option value="">— Selecione —</option>
                         <?php foreach ($list['options'] as $opt):
                             $optId   = $opt[$list['id_field']] ?? null;
@@ -87,8 +97,8 @@ if (!function_exists('fmtMoneyInput')) {
                             <?= $required ? 'required' : '' ?>
                             placeholder="0,00"
                             data-money="1"
-                            class="form-input"
-                            <?= $describedBy ?>
+                            class="form-input<?= $invalidClass ?>"
+                            <?= $describedBy ?><?= $invalidAttr ?>
                         >
                     </div>
 
@@ -131,10 +141,17 @@ if (!function_exists('fmtMoneyInput')) {
                         <?= isset($field['max']) ? 'max="' . htmlspecialchars((string)$field['max']) . '"' : '' ?>
                         <?= isset($field['step']) ? 'step="' . htmlspecialchars((string)$field['step']) . '"' : '' ?>
                         <?= isset($field['pattern']) ? 'pattern="' . htmlspecialchars($field['pattern']) . '"' : '' ?>
-                        class="form-input"
+                        class="form-input<?= $invalidClass ?>"
                         placeholder="<?= htmlspecialchars($label) ?>"
-                        <?= $describedBy ?>
+                        <?= $describedBy ?><?= $invalidAttr ?><?= $maxLenAttr ?>
                     >
+                <?php endif; ?>
+
+                <?php if ($fieldError): ?>
+                <small class="field-error" id="<?= htmlspecialchars($errorId) ?>" role="alert">
+                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                    <?= htmlspecialchars($fieldError) ?>
+                </small>
                 <?php endif; ?>
 
                 <?php if ($hint): ?>
