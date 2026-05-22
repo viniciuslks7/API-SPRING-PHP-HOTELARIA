@@ -15,6 +15,7 @@
             <span class="nav-section-title" id="nav-principal">Principal</span>
             <a href="?page=dashboard" class="nav-link <?= ($page ?? '') === 'dashboard' ? 'active' : '' ?>"
                <?= ($page ?? '') === 'dashboard' ? 'aria-current="page"' : '' ?>
+               data-tooltip="Dashboard"
                style="--i: <?= $navIdx++ ?>">
                 <i class="fas fa-chart-line" aria-hidden="true"></i>
                 <span>Dashboard</span>
@@ -31,6 +32,7 @@
             ?>
             <a href="?page=<?= $slug ?>" class="nav-link <?= $isActive ? 'active' : '' ?>"
                <?= $isActive ? 'aria-current="page"' : '' ?>
+               data-tooltip="<?= htmlspecialchars($e['title']) ?>"
                style="--i: <?= $navIdx++ ?>">
                 <i class="fas <?= $e['icon'] ?>" aria-hidden="true"></i>
                 <span><?= $e['title'] ?></span>
@@ -48,6 +50,7 @@
             ?>
             <a href="?page=<?= $slug ?>" class="nav-link <?= $isActive ? 'active' : '' ?>"
                <?= $isActive ? 'aria-current="page"' : '' ?>
+               data-tooltip="<?= htmlspecialchars($e['title']) ?>"
                style="--i: <?= $navIdx++ ?>">
                 <i class="fas <?= $e['icon'] ?>" aria-hidden="true"></i>
                 <span><?= $e['title'] ?></span>
@@ -65,6 +68,7 @@
             ?>
             <a href="?page=<?= $slug ?>" class="nav-link <?= $isActive ? 'active' : '' ?>"
                <?= $isActive ? 'aria-current="page"' : '' ?>
+               data-tooltip="<?= htmlspecialchars($e['title']) ?>"
                style="--i: <?= $navIdx++ ?>">
                 <i class="fas <?= $e['icon'] ?>" aria-hidden="true"></i>
                 <span><?= $e['title'] ?></span>

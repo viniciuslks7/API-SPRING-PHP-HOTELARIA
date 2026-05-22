@@ -76,6 +76,9 @@ $errorMsg   = $_GET['error'] ?? null;
     <!-- SIDEBAR -->
     <?php include __DIR__ . '/views/partials/sidebar.php'; ?>
 
+    <!-- Backdrop pra fechar sidebar no mobile -->
+    <div class="sidebar-backdrop" data-sidebar-backdrop hidden></div>
+
     <!-- MAIN CONTENT -->
     <main class="main-content" id="main-content" tabindex="-1">
         <!-- Top Bar -->
@@ -97,6 +100,11 @@ $errorMsg   = $_GET['error'] ?? null;
             <div class="top-bar-badge">
                 <span class="badge-api"><i class="fas fa-plug" aria-hidden="true"></i> API Spring Boot</span>
             </div>
+            <button type="button" class="cmdk-trigger" onclick="openCommandPalette()" aria-label="Abrir paleta de comandos" aria-haspopup="dialog">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <span>Buscar…</span>
+                <kbd>Ctrl K</kbd>
+            </button>
             <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar entre tema claro e escuro" aria-pressed="false" id="theme-toggle-btn">
                 <i class="fas fa-moon icon-dark" aria-hidden="true"></i>
                 <i class="fas fa-sun icon-light" aria-hidden="true"></i>
@@ -120,6 +128,47 @@ $errorMsg   = $_GET['error'] ?? null;
             ?>
         </div>
     </main>
+
+    <!-- Command Palette -->
+    <div class="cmdk-overlay" id="cmdk-overlay" hidden role="dialog" aria-modal="true" aria-label="Paleta de comandos">
+        <div class="cmdk-panel">
+            <div class="cmdk-input-wrap">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="text"
+                       id="cmdk-input"
+                       class="cmdk-input"
+                       placeholder="Ir para... (digite o nome da entidade)"
+                       autocomplete="off"
+                       aria-label="Buscar comando">
+                <kbd>ESC</kbd>
+            </div>
+            <ul class="cmdk-list" id="cmdk-list" role="listbox" aria-label="Resultados">
+                <li class="cmdk-item" role="option" data-cmd="?page=dashboard">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i>
+                    <span class="cmdk-label">Dashboard</span>
+                    <span class="cmdk-hint">Principal</span>
+                </li>
+                <?php foreach ($ENTITIES as $cmdSlug => $cmdCfg): ?>
+                <li class="cmdk-item" role="option" data-cmd="?page=<?= htmlspecialchars($cmdSlug) ?>">
+                    <i class="fas <?= htmlspecialchars($cmdCfg['icon']) ?>" aria-hidden="true"></i>
+                    <span class="cmdk-label"><?= htmlspecialchars($cmdCfg['title']) ?></span>
+                    <span class="cmdk-hint"><?= htmlspecialchars($cmdSlug) ?></span>
+                </li>
+                <?php endforeach; ?>
+                <li class="cmdk-item" role="option" data-cmd="__theme__">
+                    <i class="fas fa-circle-half-stroke" aria-hidden="true"></i>
+                    <span class="cmdk-label">Alternar tema claro/escuro</span>
+                    <span class="cmdk-hint">Ação</span>
+                </li>
+            </ul>
+            <div class="cmdk-empty" id="cmdk-empty" hidden>Nenhum comando encontrado.</div>
+            <div class="cmdk-footer">
+                <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+                <span><kbd>Enter</kbd> abrir</span>
+                <span><kbd>ESC</kbd> fechar</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Custom JS -->
     <script src="assets/js/app.js?v=<?= @filemtime(__DIR__ . '/assets/js/app.js') ?: time() ?>"></script>

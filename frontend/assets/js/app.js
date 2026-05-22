@@ -27,10 +27,142 @@ function swalTheme() {
         : { background: '#1e1e2e', color: '#cdd6f4' };
 }
 
-// === Sidebar Toggle ===
+// === Sidebar Toggle (mobile: hide, desktop: collapse icon-only) ===
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
-    document.querySelector('.main-content').classList.toggle('expanded');
+    const sidebar = document.getElementById('sidebar');
+    const main = document.querySelector('.main-content');
+    const backdrop = document.querySelector('[data-sidebar-backdrop]');
+    const isMobile = window.innerWidth < 769;
+    const willCollapse = !sidebar.classList.contains('collapsed');
+
+    sidebar.classList.toggle('collapsed');
+    main.classList.toggle('expanded');
+
+    if (isMobile && backdrop) {
+        backdrop.hidden = willCollapse;
+        requestAnimationFrame(() => backdrop.classList.toggle('is-visible', !willCollapse));
+    }
+
+    if (!isMobile) {
+        localStorage.setItem('hm-sidebar-collapsed', willCollapse ? '1' : '0');
+    }
+}
+
+function restoreSidebarState() {
+    if (window.innerWidth >= 769 && localStorage.getItem('hm-sidebar-collapsed') === '1') {
+        document.getElementById('sidebar')?.classList.add('collapsed');
+        document.querySelector('.main-content')?.classList.add('expanded');
+    } else if (window.innerWidth < 769) {
+        // Mobile sempre começa colapsado
+        document.getElementById('sidebar')?.classList.add('collapsed');
+        document.querySelector('.main-content')?.classList.add('expanded');
+    }
+}
+
+function initSidebarBackdrop() {
+    const backdrop = document.querySelector('[data-sidebar-backdrop]');
+    if (!backdrop) return;
+    backdrop.addEventListener('click', () => toggleSidebar());
+}
+
+// === Command Palette (Ctrl+K) ===
+function openCommandPalette() {
+    const overlay = document.getElementById('cmdk-overlay');
+    if (!overlay) return;
+    overlay.hidden = false;
+    const input = document.getElementById('cmdk-input');
+    input.value = '';
+    filterCmdkItems('');
+    setTimeout(() => input.focus(), 30);
+}
+
+function closeCommandPalette() {
+    const overlay = document.getElementById('cmdk-overlay');
+    if (overlay) overlay.hidden = true;
+}
+
+function filterCmdkItems(q) {
+    const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const query = norm(q.trim());
+    const items = document.querySelectorAll('.cmdk-item');
+    const empty = document.getElementById('cmdk-empty');
+    let visibleCount = 0;
+    let firstVisible = null;
+
+    items.forEach((item) => {
+        const text = norm(item.textContent);
+        const match = !query || text.includes(query);
+        item.hidden = !match;
+        item.classList.remove('is-active');
+        if (match) {
+            visibleCount++;
+            if (!firstVisible) firstVisible = item;
+        }
+    });
+
+    if (firstVisible) firstVisible.classList.add('is-active');
+    if (empty) empty.hidden = visibleCount > 0;
+}
+
+function moveCmdkSelection(direction) {
+    const items = Array.from(document.querySelectorAll('.cmdk-item:not([hidden])'));
+    if (!items.length) return;
+    const currentIdx = items.findIndex(i => i.classList.contains('is-active'));
+    items.forEach(i => i.classList.remove('is-active'));
+    let next = currentIdx + direction;
+    if (next < 0) next = items.length - 1;
+    if (next >= items.length) next = 0;
+    items[next].classList.add('is-active');
+    items[next].scrollIntoView({ block: 'nearest' });
+}
+
+function executeCmdkAction(cmd) {
+    if (cmd === '__theme__') {
+        toggleTheme();
+        closeCommandPalette();
+        return;
+    }
+    if (cmd) window.location.href = cmd;
+}
+
+function initCommandPalette() {
+    const overlay = document.getElementById('cmdk-overlay');
+    if (!overlay) return;
+    const input = document.getElementById('cmdk-input');
+
+    input.addEventListener('input', () => filterCmdkItems(input.value));
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') { e.preventDefault(); moveCmdkSelection(1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); moveCmdkSelection(-1); }
+        else if (e.key === 'Enter') {
+            e.preventDefault();
+            const active = overlay.querySelector('.cmdk-item.is-active');
+            if (active) executeCmdkAction(active.dataset.cmd);
+        }
+        else if (e.key === 'Escape') closeCommandPalette();
+    });
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeCommandPalette();
+    });
+
+    document.querySelectorAll('.cmdk-item').forEach((item) => {
+        item.addEventListener('click', () => executeCmdkAction(item.dataset.cmd));
+        item.addEventListener('mouseenter', () => {
+            overlay.querySelectorAll('.cmdk-item').forEach(i => i.classList.remove('is-active'));
+            item.classList.add('is-active');
+        });
+    });
+
+    // Atalho global Ctrl+K / Cmd+K
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            if (overlay.hidden) openCommandPalette();
+            else closeCommandPalette();
+        }
+    });
 }
 
 // === Delete Confirmation ===
@@ -408,6 +540,9 @@ function initListTable() {
 // === Boot ===
 document.addEventListener('DOMContentLoaded', () => {
     syncThemeToggle();
+    restoreSidebarState();
+    initSidebarBackdrop();
+    initCommandPalette();
     initFormLoading();
     initInlineValidation();
     initListTable();
