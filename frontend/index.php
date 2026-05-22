@@ -47,10 +47,18 @@ $errorMsg   = $_GET['error'] ?? null;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Manager — Sistema de Gestão</title>
     <script>
-        // Aplica o tema antes do paint para evitar flash.
+        // Aplica tema e configurações de acessibilidade antes do paint pra evitar flash.
         (function() {
-            var t = localStorage.getItem('hm-theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', t);
+            var root = document.documentElement;
+            root.setAttribute('data-theme', localStorage.getItem('hm-theme') || 'dark');
+
+            var scale = localStorage.getItem('hm-a11y-font-scale');
+            if (scale) root.style.setProperty('--a11y-font-scale', scale);
+
+            ['contrast', 'underline', 'motion', 'guide'].forEach(function(key) {
+                var v = localStorage.getItem('hm-a11y-' + key);
+                if (v !== null) root.setAttribute('data-a11y-' + key, v);
+            });
         })();
     </script>
     <meta name="description" content="Sistema de gestão hoteleira — FATEC Jales">
@@ -80,9 +88,9 @@ $errorMsg   = $_GET['error'] ?? null;
     <div class="sidebar-backdrop" data-sidebar-backdrop hidden></div>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content" id="main-content" tabindex="-1">
+    <main class="main-content" id="main-content" tabindex="-1" role="main">
         <!-- Top Bar -->
-        <header class="top-bar">
+        <header class="top-bar" role="banner">
             <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Abrir/fechar menu lateral" aria-controls="sidebar">
                 <i class="fas fa-bars" aria-hidden="true"></i>
             </button>
@@ -194,6 +202,71 @@ $errorMsg   = $_GET['error'] ?? null;
 
     <!-- Toast container (top-right) -->
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- Menu de Acessibilidade (FAB + drawer) -->
+    <div class="a11y-menu" id="a11y-menu">
+        <button type="button"
+                class="a11y-fab"
+                id="a11y-fab"
+                onclick="toggleA11yMenu()"
+                aria-label="Abrir menu de acessibilidade"
+                aria-expanded="false"
+                aria-controls="a11y-drawer">
+            <i class="fas fa-universal-access" aria-hidden="true"></i>
+        </button>
+        <div class="a11y-drawer" id="a11y-drawer" hidden role="dialog" aria-label="Opções de acessibilidade">
+            <div class="a11y-drawer-header">
+                <h2><i class="fas fa-universal-access" aria-hidden="true"></i> Acessibilidade</h2>
+                <button type="button" class="a11y-close" onclick="toggleA11yMenu()" aria-label="Fechar menu">
+                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="a11y-drawer-body">
+                <fieldset class="a11y-group">
+                    <legend>Tamanho do texto</legend>
+                    <div class="a11y-font-controls">
+                        <button type="button" data-a11y-font="decrease" aria-label="Diminuir fonte">A−</button>
+                        <button type="button" data-a11y-font="reset" aria-label="Tamanho padrão">A</button>
+                        <button type="button" data-a11y-font="increase" aria-label="Aumentar fonte">A+</button>
+                    </div>
+                </fieldset>
+                <fieldset class="a11y-group">
+                    <legend>Visualização</legend>
+                    <label class="a11y-toggle">
+                        <input type="checkbox" data-a11y-toggle="contrast">
+                        <span><i class="fas fa-circle-half-stroke" aria-hidden="true"></i> Alto contraste</span>
+                    </label>
+                    <label class="a11y-toggle">
+                        <input type="checkbox" data-a11y-toggle="underline-links">
+                        <span><i class="fas fa-underline" aria-hidden="true"></i> Sublinhar links</span>
+                    </label>
+                    <label class="a11y-toggle">
+                        <input type="checkbox" data-a11y-toggle="reduce-motion">
+                        <span><i class="fas fa-pause" aria-hidden="true"></i> Pausar animações</span>
+                    </label>
+                    <label class="a11y-toggle">
+                        <input type="checkbox" data-a11y-toggle="reading-guide">
+                        <span><i class="fas fa-grip-lines" aria-hidden="true"></i> Régua de leitura</span>
+                    </label>
+                </fieldset>
+                <button type="button" class="a11y-reset" onclick="resetA11ySettings()">
+                    <i class="fas fa-rotate-left" aria-hidden="true"></i> Restaurar padrões
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VLibras (Tradutor Libras oficial gov.br) -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
 
     <!-- Custom JS -->
     <script src="assets/js/app.js?v=<?= @filemtime(__DIR__ . '/assets/js/app.js') ?: time() ?>"></script>

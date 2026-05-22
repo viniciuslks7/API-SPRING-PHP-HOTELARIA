@@ -27,6 +27,100 @@ function swalTheme() {
         : { background: '#1e1e2e', color: '#cdd6f4' };
 }
 
+// === Menu de Acessibilidade ===
+function toggleA11yMenu() {
+    const drawer = document.getElementById('a11y-drawer');
+    const fab = document.getElementById('a11y-fab');
+    if (!drawer || !fab) return;
+    const willOpen = drawer.hidden;
+    drawer.hidden = !willOpen;
+    fab.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    if (willOpen) {
+        drawer.querySelector('button, input')?.focus();
+    }
+}
+
+function applyFontScale(scale) {
+    document.documentElement.style.setProperty('--a11y-font-scale', scale);
+    localStorage.setItem('hm-a11y-font-scale', scale);
+}
+
+function applyA11yToggle(key, on) {
+    const map = {
+        'contrast':       { attr: 'data-a11y-contrast',  storage: 'hm-a11y-contrast' },
+        'underline-links':{ attr: 'data-a11y-underline', storage: 'hm-a11y-underline' },
+        'reduce-motion':  { attr: 'data-a11y-motion',    storage: 'hm-a11y-motion',  invert: true },
+        'reading-guide':  { attr: 'data-a11y-guide',     storage: 'hm-a11y-guide' },
+    };
+    const cfg = map[key];
+    if (!cfg) return;
+    const value = cfg.invert ? (on ? '0' : '1') : (on ? '1' : '0');
+    document.documentElement.setAttribute(cfg.attr, value);
+    localStorage.setItem(cfg.storage, value);
+}
+
+function resetA11ySettings() {
+    ['hm-a11y-font-scale', 'hm-a11y-contrast', 'hm-a11y-underline', 'hm-a11y-motion', 'hm-a11y-guide']
+        .forEach(k => localStorage.removeItem(k));
+    document.documentElement.style.removeProperty('--a11y-font-scale');
+    ['contrast', 'underline', 'motion', 'guide']
+        .forEach(k => document.documentElement.removeAttribute('data-a11y-' + k));
+    document.querySelectorAll('[data-a11y-toggle]').forEach(cb => cb.checked = false);
+    showToast('success', 'Configurações de acessibilidade restauradas.');
+}
+
+function initA11yMenu() {
+    // Botões de fonte
+    document.querySelectorAll('[data-a11y-font]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--a11y-font-scale')) || 1;
+            const action = btn.dataset.a11yFont;
+            let next;
+            if (action === 'increase') next = Math.min(current + 0.1, 1.6);
+            else if (action === 'decrease') next = Math.max(current - 0.1, 0.85);
+            else next = 1;
+            applyFontScale(next.toFixed(2));
+        });
+    });
+
+    // Toggles + restaura estado salvo
+    document.querySelectorAll('[data-a11y-toggle]').forEach((cb) => {
+        const key = cb.dataset.a11yToggle;
+        const map = {
+            'contrast': 'hm-a11y-contrast',
+            'underline-links': 'hm-a11y-underline',
+            'reduce-motion': 'hm-a11y-motion',
+            'reading-guide': 'hm-a11y-guide',
+        };
+        const storage = map[key];
+        const saved = storage ? localStorage.getItem(storage) : null;
+        if (saved !== null) {
+            cb.checked = key === 'reduce-motion' ? saved === '0' : saved === '1';
+        }
+        cb.addEventListener('change', () => applyA11yToggle(key, cb.checked));
+    });
+
+    // Régua de leitura segue o cursor
+    document.addEventListener('mousemove', (e) => {
+        if (document.documentElement.getAttribute('data-a11y-guide') === '1') {
+            document.documentElement.style.setProperty('--a11y-guide-y', e.clientY + 'px');
+        }
+    });
+
+    // Fechar drawer com Esc
+    document.addEventListener('keydown', (e) => {
+        const drawer = document.getElementById('a11y-drawer');
+        if (e.key === 'Escape' && drawer && !drawer.hidden) toggleA11yMenu();
+    });
+
+    // Fechar ao clicar fora
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('a11y-menu');
+        const drawer = document.getElementById('a11y-drawer');
+        if (menu && drawer && !drawer.hidden && !menu.contains(e.target)) toggleA11yMenu();
+    });
+}
+
 // === Toast notifications ===
 function showToast(kind, message, opts = {}) {
     const container = document.getElementById('toast-container');
@@ -570,6 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
     restoreSidebarState();
     initSidebarBackdrop();
     initCommandPalette();
+    initA11yMenu();
     initFormLoading();
     initInlineValidation();
     initListTable();
