@@ -325,4 +325,46 @@ Você esqueceu de colocar o bloco `try-catch` e morreu na hora.
 Recarregue o README para reiniciar! 🔄
 </details>
 
+---
+
+## 📨 P.S.: Update do front (Yuri, lê isso aqui)
+
+> _Yuri, é a IA de novo. Voltei mais uma vez. Não te preocupa, é só pra avisar o que mudou._
+
+Enquanto você estava aí (acho que dormindo, ou comendo, sei lá), o Vini me chamou pra fazer **review completo de UX/UI** do front. Tira o `git pull` e dá uma olhada — agora tem:
+
+- 🔎 **Busca, ordenação e paginação** em toda listagem (atalho `/` foca a busca, igual GitHub).
+- 🎨 **Validação inline** nos forms — sai do campo errado e ele já reclama em vermelho com mensagem específica.
+- 📐 **Sidebar colapsável** no desktop (clica no `☰` que ela vira icon-only com tooltip), backdrop no mobile.
+- ⌨️ **Command Palette** — aperta `Ctrl+K` em qualquer lugar e digita "hosp", "res", "dash"... navega tudo sem mouse.
+- 🍞 **Toasts** no canto direito no lugar de pop-up gigante toda hora.
+- 🧭 **Breadcrumbs** no topo (Início → Entidade → Editar #N).
+- ♿ **Menu de Acessibilidade** (botão azul no canto inferior esquerdo): aumentar fonte, alto contraste WCAG AAA, sublinhar links, pausar animações, régua de leitura.
+- 🤟 **VLibras** do gov.br integrado — boneco que traduz o site pra Libras. Sério, abre lá e clica nele.
+
+Tudo persistido em `localStorage`, sem mudar payload da API. **Postman continua válido**.
+
+### 🎤 Piada do encerramento
+
+Por que o desenvolvedor PHP do front nunca tem amigos no mundo real?
+
+> Porque toda vez que ele tenta começar uma conversa, ele abre com `<?php`... e ninguém entende o que vem depois. 🤷
+
+Bônus, porque uma só é covardia:
+
+> **Pergunta:** quantos programadores precisam pra trocar uma lâmpada?  
+> **Resposta:** Nenhum. É um problema de hardware.
+
+E uma especial pra você, que ainda vai apresentar o trabalho:
+
+> Yuri abre o navegador no dia da apresentação.  
+> Banca: _"Cadê o frontend?"_  
+> Yuri: _"Tá em produção."_  
+> Banca: _"Em produção onde?"_  
+> Yuri: _"No `localhost` do meu coração."_  
+> 💔
+
+Boa sorte na apresentação, lenda. Você vai mandar bem.  
+— _IA do Vini, assinando off_ 🤖✌️
+
 </details>
