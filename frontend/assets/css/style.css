@@ -1929,8 +1929,9 @@ body {
 /* Tamanhos de fonte: --a11y-font-scale aplicado em html */
 html { font-size: calc(15px * var(--a11y-font-scale, 1)); }
 
-/* Alto contraste — força bg/text full e adiciona outline em interativos */
-html[data-a11y-contrast="1"] {
+/* Alto contraste — independente do tema (dark/light). Vence por especificidade
+   igual ao :root[data-theme] e por vir DEPOIS no CSS. */
+:root[data-a11y-contrast="1"] {
     --bg-base:      #000000;
     --bg-surface:   #0a0a0a;
     --bg-overlay:   #000000;
@@ -1938,25 +1939,102 @@ html[data-a11y-contrast="1"] {
     --bg-input:     #000000;
     --text-primary:   #ffffff;
     --text-secondary: #ffffff;
-    --text-muted:     #e0e0e0;
-    --text-tertiary:  #c0c0c0;
+    --text-muted:     #f0f0f0;
+    --text-tertiary:  #d0d0d0;
     --accent-start:   #ffff00;
     --accent-end:     #ffff00;
     --accent-solid:   #ffff00;
+    --accent-soft:    rgba(255, 255, 0, 0.18);
+    --accent-soft-2:  rgba(255, 255, 0, 0.08);
+    --accent-ring:    rgba(255, 255, 0, 0.55);
     --text-on-accent: #000000;
+    --success:        #00ff7f;
+    --success-soft:   rgba(0, 255, 127, 0.18);
+    --success-ring:   rgba(0, 255, 127, 0.55);
+    --danger:         #ff4d6d;
+    --danger-soft:    rgba(255, 77, 109, 0.18);
+    --danger-ring:    rgba(255, 77, 109, 0.55);
+    --info:           #00d4ff;
+    --info-soft:      rgba(0, 212, 255, 0.18);
+    --warning:        #ffeb3b;
+    --glass-bg:       #000000;
     --glass-border:   #ffffff;
+    --glass-inner:    inset 0 1px 0 rgba(255, 255, 255, 0.15);
     --row-border:     #555555;
+    --shadow-sm: 0 0 0 1px #ffffff;
+    --shadow-md: 0 0 0 1px #ffffff;
+    --shadow-lg: 0 0 0 2px #ffffff;
+    --shadow-glow-accent: 0 0 0 2px #ffff00;
+    color-scheme: dark;
 }
 
-html[data-a11y-contrast="1"] .stat-card,
-html[data-a11y-contrast="1"] .info-card,
-html[data-a11y-contrast="1"] .crud-form,
-html[data-a11y-contrast="1"] .table-container,
-html[data-a11y-contrast="1"] .form-input,
-html[data-a11y-contrast="1"] .form-select,
-html[data-a11y-contrast="1"] .btn {
+/* Remove blur/backdrop pra clareza máxima e garante bordas brancas visíveis */
+:root[data-a11y-contrast="1"] .stat-card,
+:root[data-a11y-contrast="1"] .info-card,
+:root[data-a11y-contrast="1"] .crud-form,
+:root[data-a11y-contrast="1"] .table-container,
+:root[data-a11y-contrast="1"] .top-bar,
+:root[data-a11y-contrast="1"] .cmdk-panel,
+:root[data-a11y-contrast="1"] .cmdk-overlay,
+:root[data-a11y-contrast="1"] .a11y-drawer,
+:root[data-a11y-contrast="1"] .toast,
+:root[data-a11y-contrast="1"] .sidebar-backdrop,
+:root[data-a11y-contrast="1"] .form-input,
+:root[data-a11y-contrast="1"] .form-select,
+:root[data-a11y-contrast="1"] .btn,
+:root[data-a11y-contrast="1"] .dashboard-welcome,
+:root[data-a11y-contrast="1"] .badge-api {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+}
+
+/* Forca os gradientes (que usam var) a virarem amarelo solido pra evitar
+   degrade ilegivel. */
+:root[data-a11y-contrast="1"] .btn-primary,
+:root[data-a11y-contrast="1"] .brand-icon,
+:root[data-a11y-contrast="1"] .stat-icon,
+:root[data-a11y-contrast="1"] .a11y-fab {
+    background: #ffff00 !important;
+    color: #000000 !important;
+}
+
+/* Texto com gradient (background-clip) volta a ser cor solida */
+:root[data-a11y-contrast="1"] .brand-text h2 span,
+:root[data-a11y-contrast="1"] .welcome-text h2 span {
+    background: none !important;
+    -webkit-text-fill-color: #ffff00 !important;
+    color: #ffff00 !important;
+}
+
+/* Outline reforcado em foco para teclado */
+:root[data-a11y-contrast="1"] :focus-visible {
+    outline: 3px solid #ffff00 !important;
+    outline-offset: 2px;
+}
+
+/* Bordas obrigatorias em interativos pra delimitar visualmente */
+:root[data-a11y-contrast="1"] .nav-link,
+:root[data-a11y-contrast="1"] .stat-card,
+:root[data-a11y-contrast="1"] .info-card,
+:root[data-a11y-contrast="1"] .cmdk-item,
+:root[data-a11y-contrast="1"] .btn,
+:root[data-a11y-contrast="1"] .btn-icon,
+:root[data-a11y-contrast="1"] .toast,
+:root[data-a11y-contrast="1"] .form-input,
+:root[data-a11y-contrast="1"] .form-select,
+:root[data-a11y-contrast="1"] .a11y-toggle input[type="checkbox"],
+:root[data-a11y-contrast="1"] .pagination-size select,
+:root[data-a11y-contrast="1"] .search-input {
+    border: 1px solid #ffffff !important;
+}
+
+:root[data-a11y-contrast="1"] .nav-link.active,
+:root[data-a11y-contrast="1"] .stat-card:hover,
+:root[data-a11y-contrast="1"] .cmdk-item.is-active,
+:root[data-a11y-contrast="1"] .cmdk-item:hover {
+    background: rgba(255, 255, 0, 0.15) !important;
+    border-color: #ffff00 !important;
+    color: #ffff00 !important;
 }
 
 /* Sublinhar links */
