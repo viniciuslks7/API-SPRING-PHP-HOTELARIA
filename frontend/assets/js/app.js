@@ -27,6 +27,33 @@ function swalTheme() {
         : { background: '#1e1e2e', color: '#cdd6f4' };
 }
 
+// === Toast notifications ===
+function showToast(kind, message, opts = {}) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const duration = opts.duration ?? (kind === 'error' ? 5000 : 2800);
+    const icons = { success: 'fa-check', error: 'fa-xmark', info: 'fa-info' };
+    const icon = icons[kind] || 'fa-info';
+
+    const el = document.createElement('div');
+    el.className = `toast toast-${kind}`;
+    el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+    el.innerHTML = `
+        <div class="toast-icon"><i class="fas ${icon}" aria-hidden="true"></i></div>
+        <div class="toast-body"></div>
+        <button type="button" class="toast-close" aria-label="Fechar"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+    `;
+    el.querySelector('.toast-body').textContent = message;
+    container.appendChild(el);
+
+    const dismiss = () => {
+        el.classList.add('is-leaving');
+        setTimeout(() => el.remove(), 240);
+    };
+    el.querySelector('.toast-close').addEventListener('click', dismiss);
+    if (duration > 0) setTimeout(dismiss, duration);
+}
+
 // === Sidebar Toggle (mobile: hide, desktop: collapse icon-only) ===
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -567,6 +594,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.stat-card, .info-card').forEach((card, i) => {
         card.style.animationDelay = `${i * 0.06}s`;
+    });
+
+    // Spotlight tracking: --mouse-x / --mouse-y movem o gradient radial do stat-card
+    document.querySelectorAll('.stat-card').forEach((card) => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            card.style.setProperty('--mouse-x', `${x}%`);
+            card.style.setProperty('--mouse-y', `${y}%`);
+        });
     });
 
     document.querySelectorAll('.nav-link').forEach(link => {

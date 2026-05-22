@@ -87,13 +87,35 @@ $errorMsg   = $_GET['error'] ?? null;
                 <i class="fas fa-bars" aria-hidden="true"></i>
             </button>
             <div class="top-bar-info">
-                <h1 class="page-title">
+                <?php
+                $action = $_GET['action'] ?? null;
+                $isEntity = isset($ENTITIES[$page]);
+                ?>
+                <nav class="breadcrumbs" aria-label="Trilha de navegação">
+                    <a href="?page=dashboard" class="crumb">
+                        <i class="fas fa-house" aria-hidden="true"></i>
+                        <span>Início</span>
+                    </a>
+                    <?php if ($isEntity): ?>
+                        <span class="crumb-sep" aria-hidden="true">/</span>
+                        <a href="?page=<?= htmlspecialchars($page) ?>" class="crumb <?= !$action ? 'crumb-current' : '' ?>"
+                           <?= !$action ? 'aria-current="page"' : '' ?>>
+                            <i class="fas <?= htmlspecialchars($ENTITIES[$page]['icon']) ?>" aria-hidden="true"></i>
+                            <span><?= htmlspecialchars($ENTITIES[$page]['title']) ?></span>
+                        </a>
+                        <?php if ($action === 'create'): ?>
+                            <span class="crumb-sep" aria-hidden="true">/</span>
+                            <span class="crumb crumb-current" aria-current="page">Novo</span>
+                        <?php elseif ($action === 'edit'): ?>
+                            <span class="crumb-sep" aria-hidden="true">/</span>
+                            <span class="crumb crumb-current" aria-current="page">Editar #<?= htmlspecialchars($_GET['id'] ?? '') ?></span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </nav>
+                <h1 class="page-title visually-hidden">
                     <?php
-                    if ($page === 'dashboard') {
-                        echo '<i class="fas fa-chart-line" aria-hidden="true"></i> Dashboard';
-                    } elseif (isset($ENTITIES[$page])) {
-                        echo '<i class="fas ' . $ENTITIES[$page]['icon'] . '" aria-hidden="true"></i> ' . $ENTITIES[$page]['title'];
-                    }
+                    if ($page === 'dashboard') echo 'Dashboard';
+                    elseif ($isEntity) echo $ENTITIES[$page]['title'];
                     ?>
                 </h1>
             </div>
@@ -170,30 +192,23 @@ $errorMsg   = $_GET['error'] ?? null;
         </div>
     </div>
 
+    <!-- Toast container (top-right) -->
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
     <!-- Custom JS -->
     <script src="assets/js/app.js?v=<?= @filemtime(__DIR__ . '/assets/js/app.js') ?: time() ?>"></script>
 
     <?php if ($successMsg): ?>
     <script>
-        Swal.fire({
-            ...swalTheme(),
-            icon: 'success',
-            title: <?= json_encode($successMsg === "created" ? "Criado!" : ($successMsg === "updated" ? "Atualizado!" : "Deletado!")) ?>,
-            text: 'Operação realizada com sucesso.',
-            timer: 2000,
-            showConfirmButton: false,
-        });
+        const __msg = <?= json_encode($successMsg === "created" ? "Registro criado." : ($successMsg === "updated" ? "Registro atualizado." : "Registro removido.")) ?>;
+        document.addEventListener('DOMContentLoaded', () => showToast('success', __msg));
     </script>
     <?php endif; ?>
 
     <?php if ($errorMsg): ?>
     <script>
-        Swal.fire({
-            ...swalTheme(),
-            icon: 'error',
-            title: 'Erro',
-            text: <?= json_encode($errorMsg) ?>,
-        });
+        const __err = <?= json_encode($errorMsg) ?>;
+        document.addEventListener('DOMContentLoaded', () => showToast('error', __err));
     </script>
     <?php endif; ?>
 
